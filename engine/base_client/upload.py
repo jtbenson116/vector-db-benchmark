@@ -7,6 +7,7 @@ import tqdm
 from dataset_reader.base_reader import Record
 from engine.base_client.utils import iter_batches
 
+DEBUG = False
 
 class BaseUploader:
     client = None
@@ -38,7 +39,9 @@ class BaseUploader:
             self.host, distance, self.connection_params, self.upload_params
         )
 
-        if parallel == 1:
+        if parallel == 0: # GW hack to bypass upload stage via config
+            if DEBUG: print("Warning: BaseUploader: update: skipping upload...")
+        elif parallel == 1:
             for batch in iter_batches(tqdm.tqdm(records), batch_size):
                 latencies.append(self._upload_batch(batch))
         else:
@@ -62,7 +65,7 @@ class BaseUploader:
 
         upload_time = time.perf_counter() - start
 
-        print("Upload time: {}".format(upload_time))
+        if DEBUG: print("Upload time: {}".format(upload_time))
 
         post_upload_stats = self.post_upload(distance)
 

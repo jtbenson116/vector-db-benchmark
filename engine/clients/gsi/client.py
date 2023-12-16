@@ -1,6 +1,9 @@
+import os
 import swagger_client
 from swagger_client.models import *
 from engine.clients.gsi.config import GSI_DEFAULT_ALLOC, GSI_DEFAULT_PORT, GSI_DEFAULT_VERSION
+
+DEBUG = False
 
 class GSIClient:
     def __init__(self, host, connection_params):
@@ -18,7 +21,15 @@ class GSIClient:
 
         self.dataset_ids = []
 
+        if DEBUG: print("GSIClient:__init__ done")
+
     def cleanup(self):
+
+        # check for an existing fvs datasetid to not delete (for debugging)
+        use_datasetid = os.getenv("VDBB_FVS_DATASETID")
+        if use_datasetid:
+            print("Warning: GSIClient: cleanup: skipping fvs cleanup of datasetid=", use_datasetid)
+            return 
 
         # print('Clearing cache...')
         # self.utilities_apis.controllers_utilities_controller_clear_cache(self.allocation_id)
@@ -39,4 +50,4 @@ class GSIClient:
                 dataset_id=dataset_id['id'], allocation_token=self.allocation_id
             )
 
-        print('Done cleaning')
+        if DEBUG: print('GSIClient: cleanup: done')
