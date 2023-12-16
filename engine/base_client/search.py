@@ -5,11 +5,13 @@ from typing import Iterable, List, Optional, Tuple
 
 import numpy as np
 import tqdm
+import os
 
 from dataset_reader.base_reader import Query
 
 DEFAULT_TOP = 10
 
+DEBUG = False
 
 class BaseSearcher:
     MP_CONTEXT = None
@@ -37,13 +39,22 @@ class BaseSearcher:
 
     @classmethod
     def _search_one(cls, query, top: Optional[int] = None):
+        
+        if cls.__name__ == "GSISearcher":
+            from engine.clients.gsi.config import GSI_DEFAULT_QUERY_PATH
+            vec = np.array(query.vector)
+            vec = vec.reshape(1, len(vec))
+            vec = np.float32(vec)
+            np.save(GSI_DEFAULT_QUERY_PATH, vec)            
+            if DEBUG: print("BaseSearcher: _search_one: saving vec to", vec, GSI_DEFAULT_QUERY_PATH)
+        
         if top is None:
             top = (
                 len(query.expected_result)
                 if query.expected_result is not None and len(query.expected_result) > 0
                 else DEFAULT_TOP
-            )
-
+            )        
+            
         start = time.perf_counter()
         search_res = cls.search_one(query.vector, query.meta_conditions, top)
         end = time.perf_counter()
@@ -51,6 +62,7 @@ class BaseSearcher:
         precision = 1.0
         if query.expected_result:
             ids = set(x[0] for x in search_res)
+            if DEBUG: print("BaseSearcher: _search_one: recall compute", ids, query.expected_result[0:10])
             precision = len(ids.intersection(query.expected_result[:top])) / top
 
         return precision, end - start
@@ -63,6 +75,8 @@ class BaseSearcher:
         parallel = self.search_params.pop("parallel", 1)
         top = self.search_params.pop("top", None)
 
+        if DEBUG: print("BaseSearcher: search_all: paramters=", parallel, top)
+
         # setup_search may require initialized client
         self.init_client(
             self.host, distance, self.connection_params, self.search_params
@@ -71,7 +85,12 @@ class BaseSearcher:
 
         search_one = functools.partial(self.__class__._search_one, top=top)
 
-        if parallel == 1:
+        if parallel == 0: # a troubleshooting mode to run subset of queries
+            start = time.perf_counter()
+            precisions, latencies = list(
+                zip(*[search_one(query) for idx, query in enumerate(tqdm.tqdm(queries)) if idx < 1])
+            )
+        elif parallel == 1:
             start = time.perf_counter()
             precisions, latencies = list(
                 zip(*[search_one(query) for query in tqdm.tqdm(queries)])
