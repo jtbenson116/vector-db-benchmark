@@ -10,3 +10,5 @@ redis==4.6.0
 opensearch-py==2.2.0
 weaviate-client==3.21.0
 npy-append-array==0.9.16
+matplotlib==3.7.3
+ipykernel==6.26.0
