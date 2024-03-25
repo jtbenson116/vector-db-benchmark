@@ -1,6 +1,6 @@
 import os
 from struct import *
-from subprocess import run
+from subprocess import run as run
 from datetime import datetime
 
 def convert_np_to_fbin(arr, out):
@@ -50,6 +50,7 @@ def gen_labels(db_path, out):
     f.close()
     print("Closed %s" % out)
 
+
 def gxl_upload(db, m, efc):
     ret = {"cen_gen":None, "knn_gen": None, "knn_sym": None, "idx_gen": None}
     
@@ -67,20 +68,24 @@ def gxl_upload(db, m, efc):
     
     if not os.path.exists(f"{gxl_tmp}/{cen}"):
         s = datetime.now()
+        print("running cmd: ", f"/home/jacob/GXL/bin/run-gxl-cen-gen {db}")
         run(f"/home/jacob/GXL/bin/run-gxl-cen-gen {db}", shell=True) # produces centroids bin
         e = datetime.now()
         ret['cen_gen'] = (e-s).total_seconds()
     if not os.path.exists(f"{gxl_tmp}/{knn}"):
         s = datetime.now()
+        print("running cmd: ",f"/home/jacob/GXL/bin/run-gxl --db {db} --cent {gxl_tmp}/{cen}")
         run(f"/home/jacob/GXL/bin/run-gxl --db {db} --cent {gxl_tmp}/{cen}", shell=True) # produces knn_graph and distances
         e = datetime.now()
         ret['knn_gen'] = (e-s).total_seconds()
     if not os.path.exists(f"{gxl_tmp}/{s_knn}"):
         s = datetime.now()
+        print("running cmd:", f"/home/jacob/GXL/bin/run-make-symmetric {gxl_tmp}/{knn} {gxl_tmp}/{dists}")
         run(f"/home/jacob/GXL/bin/run-make-symmetric {gxl_tmp}/{knn} {gxl_tmp}/{dists}", shell=True) # produces s_knn_graph
         e = datetime.now()
         ret['knn_sym'] = (e-s).total_seconds()
     s = datetime.now()
+    print("running cmd:" f"/home/jacob/GXL/bin/gxl-hnsw-idx-gen {db} {gxl_tmp}/{labels} {gxl_tmp}/{s_knn} {m} {efc}")
     run(f"/home/jacob/GXL/bin/gxl-hnsw-idx-gen {db} {gxl_tmp}/{labels} {gxl_tmp}/{s_knn} {m} {efc}", shell=True) # produces deep1B_%dm_ef_%d_M_%d_gxl.bin
     e = datetime.now()
     ret['idx_gen'] = (e-s).total_seconds()

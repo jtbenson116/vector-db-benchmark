@@ -3,13 +3,13 @@
 set -e
 set -x
 
-USER=jacob
-SOURCEDIR="/mnt/nas2/$USER/vdbenchmark_results/"
+USER=gwilliams
+SOURCEDIR="/mnt/nas2/jacob/vdbenchmark_results/"
 SOURCE="$USER@192.168.99.40:$SOURCEDIR"
 mkdir -p ./results
 rsync -azvd0 "$SOURCE" ./results/
 
-SOURCEDIR="/mnt/nas2/$USER/weaviate_results/"
+SOURCEDIR="/mnt/nas2/jacob/weaviate_results/"
 SOURCE="$USER@192.168.99.40:$SOURCEDIR"
 rsync -azvd0 "$SOURCE" ./results/
 
