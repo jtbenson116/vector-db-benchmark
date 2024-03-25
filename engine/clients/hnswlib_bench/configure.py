@@ -17,13 +17,19 @@ class HNSWLibConfigurator(BaseConfigurator):
         super().__init__(host, collection_params, connection_params)
         
     def clean(self):
-        os.remove(DEFAULT_INDEX_PATH)
+        #GW
+        if os.path.exists(DEFAULT_INDEX_PATH):
+            print("Found and removing", DEFAULT_INDEX_PATH)
+        #GW
+            os.remove(DEFAULT_INDEX_PATH)
 
     def recreate(self, dataset: Dataset, collection_params):
         # get index build parameters
         space = self.DISTANCE_MAPPING.get(dataset.config.distance)
         name = dataset.config.name
-        datadir = "/home/jacob/vector-db-benchmark/datasets"
+        #GW datadir = "/home/jacob/vector-db-benchmark/datasets"
+        datadir = "./datasets/"
+        #GW
         f = h5py.File(f"{datadir}/{name}/{name}.hdf5")
         num_elements, dim = f['train'].shape
         print("Num Elements", num_elements, " dim", dim)

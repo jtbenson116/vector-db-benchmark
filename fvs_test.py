@@ -14,7 +14,7 @@ search_apis = swagger_client.SearchApi(api_config)
 importDataset=True
 loadDataset=True
 
-records = "/mnt/nas1/fvs_benchmark_datasets/deep-10K.npy"
+records = "/mnt/nas1/fvs_benchmark_datasets/deep-1M.npy"
 qpath = "/mnt/nas1/fvs_benchmark_datasets/deep-queries-10.npy"
 # records = "/home/public/tmpQdrant.npy"
 # qpath = "/home/public/oneVecQdrant.npy"
