@@ -63,6 +63,9 @@ class BaseUploader:
             f = h5py.File(data_path)
             train = f['train'][:]
             
+            # 
+            # CHANGE IF USING NEW DATASETS
+            # 
             if not os.path.exists(GXL_BIN_PATH):
                 convert_np_to_fbin(train, GXL_BIN_PATH)
             ret = gxl_upload(GXL_BIN_PATH, m, efc)

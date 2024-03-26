@@ -4,6 +4,7 @@ from subprocess import run
 from datetime import datetime
 
 def convert_np_to_fbin(arr, out):
+    
     print("convert np to fbin")
     if not os.path.exists(out):
         run(f"touch {out}", shell=True)
@@ -34,8 +35,11 @@ def gen_labels(db_path, out):
     f.close()
     print("size=", vals[0], vals[1])
 
-    # open lbl file for write
+    # create labels file
+    if os.path.exists(out):
+        os.remove(out)
     f = open(out, "wb")
+    
     # create the fbin header
     header = pack("<II", vals[0], 8)
     print("header bytes =", len(header))
@@ -54,7 +58,15 @@ def gxl_upload(db, m, efc):
     ret = {"cen_gen":None, "knn_gen": None, "knn_sym": None, "idx_gen": None}
     
     gxl_tmp = "/home/jacob/GXL/tmp"
-    os.chdir(gxl_tmp)
+    if os.path.exists(gxl_tmp):
+        os.chdir(gxl_tmp)
+        curr = os.listdir(gxl_tmp)
+        for item in curr:
+            if "tmpDB.bin" in item: continue #keep tmpDB.bin, fbin from npy file
+            else: os.remove(item)
+    else:
+        os.mkdir(gxl_tmp)
+        os.chdir(gxl_tmp)
     
     cen = "generated_q_centroids.bin"
     knn = "knn_graph.bin"
@@ -62,24 +74,22 @@ def gxl_upload(db, m, efc):
     s_knn = "s_knn_graph.bin"
     labels = "labels.lbl"
     
-    if not os.path.exists(f"{gxl_tmp}/{labels}"):
-        gen_labels(db, f"{gxl_tmp}/{labels}")
+    gen_labels(db, f"{gxl_tmp}/{labels}")
+    s = datetime.now()
+    run(f"/home/jacob/GXL/bin/run-gxl-cen-gen {db}", shell=True) # produces centroids bin
+    e = datetime.now()
+    ret['cen_gen'] = (e-s).total_seconds()
     
-    if not os.path.exists(f"{gxl_tmp}/{cen}"):
-        s = datetime.now()
-        run(f"/home/jacob/GXL/bin/run-gxl-cen-gen {db}", shell=True) # produces centroids bin
-        e = datetime.now()
-        ret['cen_gen'] = (e-s).total_seconds()
-    if not os.path.exists(f"{gxl_tmp}/{knn}"):
-        s = datetime.now()
-        run(f"/home/jacob/GXL/bin/run-gxl --db {db} --cent {gxl_tmp}/{cen}", shell=True) # produces knn_graph and distances
-        e = datetime.now()
-        ret['knn_gen'] = (e-s).total_seconds()
-    if not os.path.exists(f"{gxl_tmp}/{s_knn}"):
-        s = datetime.now()
-        run(f"/home/jacob/GXL/bin/run-make-symmetric {gxl_tmp}/{knn} {gxl_tmp}/{dists}", shell=True) # produces s_knn_graph
-        e = datetime.now()
-        ret['knn_sym'] = (e-s).total_seconds()
+    s = datetime.now()
+    run(f"/home/jacob/GXL/bin/run-gxl --db {db} --cent {gxl_tmp}/{cen}", shell=True) # produces knn_graph and distances
+    e = datetime.now()
+    ret['knn_gen'] = (e-s).total_seconds()
+    
+    s = datetime.now()
+    run(f"/home/jacob/GXL/bin/run-make-symmetric {gxl_tmp}/{knn} {gxl_tmp}/{dists}", shell=True) # produces s_knn_graph
+    e = datetime.now()
+    ret['knn_sym'] = (e-s).total_seconds()
+    
     s = datetime.now()
     run(f"/home/jacob/GXL/bin/gxl-hnsw-idx-gen {db} {gxl_tmp}/{labels} {gxl_tmp}/{s_knn} {m} {efc}", shell=True) # produces deep1B_%dm_ef_%d_M_%d_gxl.bin
     e = datetime.now()
