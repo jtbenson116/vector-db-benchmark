@@ -5,6 +5,8 @@ from typing import List
 import stopit
 import typer
 import os, sys
+import time
+import datetime
 
 from benchmark.config_read import read_dataset_config, read_engine_configs
 from benchmark.dataset import Dataset
@@ -28,6 +30,9 @@ def run(
     Example:
         python3 run.py --engines *-m-16-* --engines qdrant-* --datasets glove-*
     """
+    print("Starting at", str(datetime.datetime.now()), "with timeout=", timeout)
+    time.sleep(5)
+
     all_engines = read_engine_configs()
     all_datasets = read_dataset_config()
 

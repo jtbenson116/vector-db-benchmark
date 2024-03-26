@@ -1,6 +1,6 @@
 import os
 from struct import *
-from subprocess import run
+from subprocess import run as run
 from datetime import datetime
 
 def convert_np_to_fbin(arr, out):
@@ -54,6 +54,7 @@ def gen_labels(db_path, out):
     f.close()
     print("Closed %s" % out)
 
+
 def gxl_upload(db, m, efc):
     ret = {"cen_gen":None, "knn_gen": None, "knn_sym": None, "idx_gen": None}
     
@@ -91,6 +92,7 @@ def gxl_upload(db, m, efc):
     ret['knn_sym'] = (e-s).total_seconds()
     
     s = datetime.now()
+    print("running cmd:" f"/home/jacob/GXL/bin/gxl-hnsw-idx-gen {db} {gxl_tmp}/{labels} {gxl_tmp}/{s_knn} {m} {efc}")
     run(f"/home/jacob/GXL/bin/gxl-hnsw-idx-gen {db} {gxl_tmp}/{labels} {gxl_tmp}/{s_knn} {m} {efc}", shell=True) # produces deep1B_%dm_ef_%d_M_%d_gxl.bin
     e = datetime.now()
     ret['idx_gen'] = (e-s).total_seconds()
