@@ -58,7 +58,7 @@ def gen_labels(db_path, out):
 def gxl_upload(db, m, efc):
     ret = {"cen_gen":None, "knn_gen": None, "knn_sym": None, "idx_gen": None}
     
-    gxl_tmp = "/home/jacob/GXL/tmp"
+    gxl_tmp = "/home/public/GXL_2.0/tmp"
     if os.path.exists(gxl_tmp):
         os.chdir(gxl_tmp)
         curr = os.listdir(gxl_tmp)
@@ -76,27 +76,27 @@ def gxl_upload(db, m, efc):
     labels = "labels.lbl"
     
     gen_labels(db, f"{gxl_tmp}/{labels}")
-    print("Running", f"/home/jacob/GXL/bin/run-gxl-cen-gen {db}")
+    print("Running", f"/home/public/GXL_2.0/bin/run-gxl-cen-gen {db}")
     s = datetime.now()
-    run(f"/home/jacob/GXL/bin/run-gxl-cen-gen {db}", shell=True) # produces centroids bin
+    run(f"/home/public/GXL_2.0/bin/run-gxl-cen-gen {db}", shell=True) # produces centroids bin
     e = datetime.now()
     ret['cen_gen'] = (e-s).total_seconds()
    
-    print("Running",f"/home/jacob/GXL/bin/run-gxl --db {db} --cent {gxl_tmp}/{cen}") 
+    print("Running",f"/home/public/GXL_2.0/bin/run-gxl --db {db} --cent {gxl_tmp}/{cen}") 
     s = datetime.now()
-    run(f"/home/jacob/GXL/bin/run-gxl --db {db} --cent {gxl_tmp}/{cen}", shell=True) # produces knn_graph and distances
+    run(f"/home/public/GXL_2.0/bin/run-gxl --db {db} --cent {gxl_tmp}/{cen}", shell=True) # produces knn_graph and distances
     e = datetime.now()
     ret['knn_gen'] = (e-s).total_seconds()
    
-    print("Running", f"/home/jacob/GXL/bin/run-make-symmetric {gxl_tmp}/{knn} {gxl_tmp}/{dists}") 
+    print("Running", f"/home/public/GXL_2.0/bin/run-make-symmetric {gxl_tmp}/{knn} {gxl_tmp}/{dists}") 
     s = datetime.now()
-    run(f"/home/jacob/GXL/bin/run-make-symmetric {gxl_tmp}/{knn} {gxl_tmp}/{dists}", shell=True) # produces s_knn_graph
+    run(f"/home/public/GXL_2.0/bin/run-make-symmetric {gxl_tmp}/{knn} {gxl_tmp}/{dists}", shell=True) # produces s_knn_graph
     e = datetime.now()
     ret['knn_sym'] = (e-s).total_seconds()
    
-    print("running cmd:" f"/home/jacob/GXL/bin/gxl-hnsw-idx-gen {db} {gxl_tmp}/{labels} {gxl_tmp}/{s_knn} {m} {efc}")
+    print("running cmd:" f"/home/public/GXL_2.0/bin/gxl-hnsw-idx-gen {db} {gxl_tmp}/{labels} {gxl_tmp}/{s_knn} {m} {efc}")
     s = datetime.now()
-    run(f"/home/jacob/GXL/bin/gxl-hnsw-idx-gen {db} {gxl_tmp}/{labels} {gxl_tmp}/{s_knn} {m} {efc}", shell=True) # produces deep1B_%dm_ef_%d_M_%d_gxl.bin
+    run(f"/home/public/GXL_2.0/bin/gxl-hnsw-idx-gen {db} {gxl_tmp}/{labels} {gxl_tmp}/{s_knn} {m} {efc}", shell=True) # produces deep1B_%dm_ef_%d_M_%d_gxl.bin
     e = datetime.now()
     ret['idx_gen'] = (e-s).total_seconds()
     
