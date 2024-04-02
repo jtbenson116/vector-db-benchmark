@@ -10,8 +10,6 @@ parser.add_argument('-d', '--dataset') #path to the hdf5 dataset file
 parser.add_argument('-g', '--gxl') #supply a path to GXL/bin
 args = parser.parse_args()
 
-run(f"mkdir /tmp", shell=True)
-
 f = h5py.File(args.dataset, "r")
 test = f['test'][:]
 out = f"/tmp/tmpDB.bin"
@@ -20,7 +18,7 @@ if not os.path.exists(out):
 f.close()
 
 # run index generation script
-run(f"./tmp_gxl.sh {args.gxl}", shell=True)
+run(f"./gxl_debugging.sh {args.gxl}", shell=True)
 
 # read index
 index = hnswlib.Index(space="cosine", dim=96)
