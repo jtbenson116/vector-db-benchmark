@@ -24,7 +24,12 @@ class HNSWLibSearcher(BaseSearcher):
 
     @classmethod
     def search_one(cls, vector: List[float], meta_conditions, top) -> List[Tuple[int, float]]:
-        labels, distances = cls.index.knn_query(vector, k=top)
+        try:
+            labels, distances = cls.index.knn_query(vector, k=top)
+        except Exception as e:
+            print(e)
+            print('skipping a query...')
+            labels, distances = [[0]] * top, [[0]] * top
         id_score_pairs: List[Tuple[int, float]] = []
         for ind, dist in zip(labels[0], distances[0]):
             id_score_pairs.append((ind, dist))
