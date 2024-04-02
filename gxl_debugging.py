@@ -10,11 +10,11 @@ parser.add_argument('-d', '--dataset') #path to the hdf5 dataset file
 parser.add_argument('-g', '--gxl') #supply a path to GXL/bin
 args = parser.parse_args()
 
-run(f"mkdir {args.gxl}/../tmp", shell=True)
+run(f"mkdir /tmp", shell=True)
 
 f = h5py.File(args.dataset, "r")
 test = f['test'][:]
-out = f"{args.gxl}/../tmp/tmpDB.bin"
+out = f"/tmp/tmpDB.bin"
 if not os.path.exists(out):
     convert_np_to_fbin(f["train"][:], out)
 f.close()
@@ -24,7 +24,7 @@ run(f"./tmp_gxl.sh {args.gxl}", shell=True)
 
 # read index
 index = hnswlib.Index(space="cosine", dim=96)
-index.load_index(f"{args.gxl}/../tmp/deep1B_9m_ef_128_M_32_gxl.bin")
+index.load_index(f"/tmp/deep1B_9m_ef_128_M_32_gxl.bin")
 
 ef_list = [64, 128, 256, 512]
 for ef in ef_list:

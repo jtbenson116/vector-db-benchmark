@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export BIN_dir=$1
-export TMP=${BIN_dir}/../tmp
+export TMP=/tmp
 export DB=${TMP}/tmpDB.bin
 export LABELS=${TMP}/labels.lbl
 export CEN=${TMP}/generated_q_centroids.bin
