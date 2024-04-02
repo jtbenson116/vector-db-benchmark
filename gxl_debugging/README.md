@@ -22,7 +22,7 @@ Example: `python3 gxl_debugging.py --dataset ../datasets/deep-image-96-angular/d
 # Example Output
 
 ```
-$ conda create gxl-debugging python=3.10
+$ conda create -n gxl-debugging python=3.10
 
 $ conda activate gxl-debugging
 
