@@ -1,7 +1,7 @@
 #!/bin/bash
 
-export TMP=/home/public/GXL_2.0/tmp
-export BIN_dir=/home/public/GXL_2.0/bin
+export BIN_dir=$1
+export TMP=${BIN_dir}/../tmp
 export DB=${TMP}/tmpDB.bin
 export LABELS=${TMP}/labels.lbl
 export CEN=${TMP}/generated_q_centroids.bin
