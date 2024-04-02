@@ -12,3 +12,4 @@ weaviate-client==3.21.0
 npy-append-array==0.9.16
 matplotlib==3.7.3
 ipykernel==6.26.0
+hnswlib==0.8.0
