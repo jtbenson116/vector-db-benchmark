@@ -4,6 +4,9 @@ from typing import List
 
 import stopit
 import typer
+import os, sys
+import time
+import datetime
 
 from benchmark.config_read import read_dataset_config, read_engine_configs
 from benchmark.dataset import Dataset
@@ -27,6 +30,9 @@ def run(
     Example:
         python3 run.py --engines *-m-16-* --engines qdrant-* --datasets glove-*
     """
+    print("Starting at", str(datetime.datetime.now()), "with timeout=", timeout)
+    time.sleep(5)
+
     all_engines = read_engine_configs()
     all_datasets = read_dataset_config()
 
@@ -44,6 +50,7 @@ def run(
     for engine_name, engine_config in selected_engines.items():
         for dataset_name, dataset_config in selected_datasets.items():
             print(f"Running experiment: {engine_name} - {dataset_name}")
+            os.environ["DATA_PATH"] = dataset_config['path']
             client = ClientFactory(host).build_client(engine_config)
             dataset = Dataset(dataset_config)
             dataset.download()
@@ -73,6 +80,8 @@ def run(
                 if exit_on_error:
                     raise e
                 continue
+    print("done")
+    os._exit(0)
 
 
 if __name__ == "__main__":

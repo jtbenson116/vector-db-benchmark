@@ -2,6 +2,9 @@ import time
 from multiprocessing import get_context
 from typing import Iterable, List, Optional, Tuple
 
+import numpy as np
+import h5py
+import os
 import tqdm
 
 from dataset_reader.base_reader import Record
@@ -37,6 +40,36 @@ class BaseUploader:
         self.init_client(
             self.host, distance, self.connection_params, self.upload_params
         )
+        
+        if self.__class__.__name__ == "GSIUploader":
+            ret = {"centroids_hamming_k": None,
+                    "centroids_rerank": None,
+                    "hamming_k": None,
+                    "num_of_boards": None,
+                    "num_of_clusters": None}
+            
+            for key in ret.keys():
+                if key in self.upload_params.keys():
+                    ret[key] = self.upload_params[key]
+
+            return ret
+            
+        if self.__class__.__name__ == "HNSWLibUploader" and os.environ['GXL'] == 'true':
+            from engine.clients.hnswlib_bench.GXL_helpers import convert_np_to_fbin, gxl_upload
+            from engine.clients.hnswlib_bench.config import DEFAULT_INDEX_PATH, GXL_BIN_PATH
+            m, efc = self.upload_params["m"], self.upload_params["efConstruction"]
+            
+            data_path = os.path.join(os.path.abspath("./datasets"), os.getenv("DATA_PATH"))
+            f = h5py.File(data_path)
+            train = f['train'][:]
+            
+            # 
+            # CHANGE IF USING NEW DATASETS
+            # 
+            if not os.path.exists(GXL_BIN_PATH):
+                convert_np_to_fbin(train, GXL_BIN_PATH)
+            ret = gxl_upload(GXL_BIN_PATH, m, efc)
+            return ret                    
 
         if parallel == 1:
             for batch in iter_batches(tqdm.tqdm(records), batch_size):
