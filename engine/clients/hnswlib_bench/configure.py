@@ -28,7 +28,7 @@ class HNSWLibConfigurator(BaseConfigurator):
         space = self.DISTANCE_MAPPING.get(dataset.config.distance)
         name = dataset.config.name
         #GW datadir = "/home/jacob/vector-db-benchmark/datasets"
-        datadir = "./datasets/"
+        datadir = "/home/jacob/benchmarks/fvs/vector-db-benchmark/datasets"
         #GW
         f = h5py.File(f"{datadir}/{name}/{name}.hdf5")
         num_elements, dim = f['train'].shape

@@ -7,11 +7,13 @@ import typer
 import os, sys
 import time
 import datetime
+import json
 
 from benchmark.config_read import read_dataset_config, read_engine_configs
 from benchmark.dataset import Dataset
 from engine.base_client import IncompatibilityError
 from engine.clients.client_factory import ClientFactory
+import power_capture
 
 app = typer.Typer()
 
@@ -20,6 +22,7 @@ app = typer.Typer()
 def run(
     engines: List[str] = typer.Option(["*"]),
     datasets: List[str] = typer.Option(["*"]),
+    power: List[str] = typer.Option(["*"]),
     host: str = "localhost",
     skip_upload: bool = False,
     skip_search: bool = False,
@@ -50,6 +53,15 @@ def run(
     for engine_name, engine_config in selected_engines.items():
         for dataset_name, dataset_config in selected_datasets.items():
             print(f"Running experiment: {engine_name} - {dataset_name}")
+
+            # make sure ipmi cap server is available
+            print(f"Starting power capture session... {power}")
+            power_capture.power_capture(power[0])
+            print("pinging ipmicap power monitor...")
+            if not power_capture.power_capture.ping():
+                raise Exception("could not ping the ipmicap power mon server")
+            psession_id = power_capture.power_capture.start()
+
             os.environ["DATA_PATH"] = dataset_config['path']
             client = ClientFactory(host).build_client(engine_config)
             dataset = Dataset(dataset_config)
@@ -68,6 +80,21 @@ def run(
                         f"exceeded {timeout} seconds"
                     )
                     exit(2)
+                print("stopping power capture...")
+                power_stats = power_capture.power_capture.stop(psession_id, all_stats=True)
+                print(f"power stats: {power_stats}")
+                power_json = f"./results/{engine_name}-{dataset.config.name}-power.json"
+                if os.path.exists(power_json):
+                    outfile = open(power_json, "r+")
+                    file_data = json.load(outfile)
+                else:
+                    outfile = open(power_json, "w")
+                    file_data = {}
+                file_data[str(datetime.datetime.now())] = power_stats
+                outfile.seek(0)
+                json.dump(file_data, outfile)
+                outfile.close()
+                
             except IncompatibilityError as e:
                 print(f"Skipping {engine_name} - {dataset_name}, incompatible params")
                 continue

@@ -10,11 +10,9 @@ def read_engine_configs() -> dict:
     engines_config_dir = os.path.join(ROOT_DIR, "experiments", "configurations")
     config_files = glob.glob(os.path.join(engines_config_dir, "*.json"))
     for config_file in config_files:
-        print("FILE", config_file)
         with open(config_file, "r") as fd:
             configs = json.load(fd)
             for config in configs:
-                print("CONFIG", config["name"])
                 all_configs[config["name"]] = config
 
     return all_configs
