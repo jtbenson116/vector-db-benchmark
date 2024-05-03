@@ -83,7 +83,7 @@ def run(
                 print("stopping power capture...")
                 power_stats = power_capture.power_capture.stop(psession_id, all_stats=True)
                 print(f"power stats: {power_stats}")
-                power_json = f"./results/{engine_name}-{dataset.config.name}-power.json"
+                power_json = f"../power_results/{engine_name}-{dataset.config.name}-power.json"
                 if os.path.exists(power_json):
                     outfile = open(power_json, "r+")
                     file_data = json.load(outfile)

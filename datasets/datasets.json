@@ -40,6 +40,30 @@
     "link": ""
   },
   {
+    "name": "deep-image-96-angular-250M",
+    "vector_size": 96,
+    "distance": "cosine",
+    "type": "h5",
+    "path": "deep-image-96-angular-250M/deep-image-96-angular-250M.hdf5",
+    "link": ""
+  },
+  {
+    "name": "deep-image-96-angular-500M",
+    "vector_size": 96,
+    "distance": "cosine",
+    "type": "h5",
+    "path": "deep-image-96-angular-500M/deep-image-96-angular-500M.hdf5",
+    "link": ""
+  },
+  {
+    "name": "deep-image-96-angular-1000M",
+    "vector_size": 96,
+    "distance": "cosine",
+    "type": "h5",
+    "path": "deep-image-96-angular-1000M/deep-image-96-angular-1000M.hdf5",
+    "link": ""
+  },
+  {
     "name": "gist-960-euclidean",
     "vector_size": 960,
     "distance": "l2",

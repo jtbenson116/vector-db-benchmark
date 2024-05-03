@@ -95,6 +95,7 @@
       - /home/ftpuser:/home/ftpuser
       - /var/lib/weaviate:/var/lib/weaviate
       - /mnt/nas1:/mnt/nas1  
+      - /home/public/fvs_benchmark_datasets:/home/public/fvs_benchmark_datasets
     ports:
       - 7760:7760
       - 7761:7760
