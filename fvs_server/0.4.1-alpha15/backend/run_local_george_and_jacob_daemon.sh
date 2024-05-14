@@ -28,7 +28,7 @@ ROOT_SHARED=/home/public/elastic-similarity
 #export FS_UPLOAD_DIR=/efs/data/upload_store/${HOSTNAME}
 #create_path $FS_UPLOAD_DIR
 
-export SERVER_TYPE=ON_PREM
+export SERVER_TYPE=CLOUD
 export FVS_TRAIN_POSTGRES_USER=fvs_post_user
 export FVS_TRAIN_POSTGRES_PASSWORD=fvs_post_passwd
 export FVS_TRAIN_POSTGRES_PORT=14032
@@ -62,4 +62,4 @@ fi
 docker-compose \
   -f ${docker_compose_fvs_file} \
   -p elastic-similarity \
-  up 
+  up -d
